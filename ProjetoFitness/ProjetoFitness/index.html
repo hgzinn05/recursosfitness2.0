@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Recursos Fitness</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f5f5f5;
+      color: #333;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background-color: #2e7d32;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+    header h1 { margin: 0 0 10px 0; }
+    nav a { color: white; text-decoration: none; font-weight: bold; }
+    nav a:hover { text-decoration: underline; }
+
+    section {
+      max-width: 900px;
+      margin: 30px auto;
+      background-color: white;
+      padding: 25px;
+      border-radius: 6px;
+      border: 1px solid #ddd;
+    }
+    section h2 {
+      color: #2e7d32;
+      border-bottom: 2px solid #2e7d32;
+      padding-bottom: 8px;
+      margin-bottom: 15px;
+    }
+    section h3 { color: #555; margin-top: 20px; }
+
+    #sobre img {
+      display: block;
+      width: 100%;
+      max-width: 500px;
+      margin: 15px auto 0;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+
+    /* === FILTRO === */
+    .filtro-container {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+    .filtro-label { font-weight: bold; color: #555; font-size: 14px; }
+    .filtro-botoes { display: flex; gap: 8px; flex-wrap: wrap; }
+    .btn-filtro {
+      padding: 7px 18px;
+      border: 2px solid #2e7d32;
+      background-color: white;
+      color: #2e7d32;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      transition: all 0.2s ease;
+    }
+    .btn-filtro:hover { background-color: #e8f5e9; }
+    .btn-filtro.ativo { background-color: #2e7d32; color: white; }
+
+    .galeria {
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .galeria-item { margin: 0; text-align: center; position: relative; }
+    .galeria-item.oculto { display: none; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .galeria-item.aparecendo { animation: fadeIn 0.35s ease forwards; }
+    .galeria img {
+      width: 220px; height: 160px;
+      object-fit: cover;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+    .galeria figcaption { margin-top: 6px; font-size: 14px; color: #666; }
+    .tag-categoria {
+      display: inline-block; margin-top: 4px;
+      font-size: 11px; background-color: #e8f5e9; color: #2e7d32;
+      padding: 2px 8px; border-radius: 10px; font-weight: 600;
+    }
+    .galeria-vazia {
+      text-align: center; color: #999;
+      font-style: italic; padding: 20px 0; width: 100%;
+    }
+
+    /* === VIDEO === */
+    #video video {
+      display: block; margin: 10px auto;
+      border: 1px solid #ccc; border-radius: 6px;
+    }
+    .legenda {
+      text-align: center; font-size: 13px;
+      color: #777; font-style: italic; margin-top: 8px;
+    }
+
+    /* === LISTAS === */
+    ul, ol { padding-left: 25px; line-height: 2; }
+
+    /* === TABELA TREINOS === */
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    th { background-color: #2e7d32; color: white; padding: 10px; text-align: left; }
+    td { padding: 10px; border: 1px solid #ddd; }
+    tr:nth-child(even) { background-color: #f0f0f0; }
+
+    /* === IMC === */
+    .imc-wrapper { display: flex; flex-direction: column; gap: 24px; }
+    .imc-form { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-end; }
+    .imc-field { display: flex; flex-direction: column; gap: 6px; }
+    .imc-field label { font-weight: bold; font-size: 14px; color: #444; }
+    .imc-field input {
+      width: 140px; padding: 9px 12px;
+      border: 2px solid #ccc; border-radius: 6px;
+      font-size: 15px; outline: none; transition: border-color 0.2s;
+    }
+    .imc-field input:focus { border-color: #2e7d32; }
+    .imc-field input.input-erro { border-color: #e53935; }
+    .erro-msg { color: #e53935; font-size: 13px; margin-top: 4px; display: block; }
+
+    #btn-calcular-imc {
+      padding: 10px 28px; background-color: #2e7d32; color: white;
+      border: none; border-radius: 6px; font-size: 15px; font-weight: 600;
+      cursor: pointer; transition: background-color 0.2s; align-self: flex-end;
+    }
+    #btn-calcular-imc:hover { background-color: #1b5e20; }
+    #btn-limpar-imc {
+      padding: 10px 20px; background-color: white; color: #888;
+      border: 2px solid #ddd; border-radius: 6px; font-size: 14px;
+      cursor: pointer; transition: all 0.2s; align-self: flex-end;
+    }
+    #btn-limpar-imc:hover { border-color: #bbb; color: #555; }
+
+    .imc-resultado {
+      background-color: #f9fdf9; border: 1px solid #c8e6c9;
+      border-radius: 10px; padding: 20px 24px;
+      animation: fadeIn 0.4s ease;
+    }
+    .imc-valor-box { display: flex; flex-direction: column; margin-bottom: 18px; }
+    .imc-label-resultado { font-size: 13px; color: #888; text-transform: uppercase; letter-spacing: .05em; }
+    .imc-numero { font-size: 48px; font-weight: 800; line-height: 1.1; }
+    .imc-classificacao { font-size: 18px; font-weight: 600; color: #555; margin-top: 2px; }
+
+    .imc-barra-container { margin: 16px 0 10px; }
+    .imc-barra {
+      position: relative; height: 14px; border-radius: 7px;
+      background: linear-gradient(to right, #42a5f5 0%, #66bb6a 25%, #ffa726 55%, #ef5350 100%);
+      margin-bottom: 6px;
+    }
+    .imc-barra-marker {
+      position: absolute; top: -5px; width: 4px; height: 24px;
+      background-color: #212121; border-radius: 2px;
+      transform: translateX(-50%);
+      transition: left 0.5s cubic-bezier(.4,0,.2,1);
+      box-shadow: 0 1px 4px rgba(0,0,0,.3);
+    }
+    .imc-barra-labels {
+      display: flex; justify-content: space-between; font-size: 11px; color: #999;
+    }
+    .imc-dica {
+      font-size: 14px; color: #555; margin-top: 12px;
+      padding: 10px 14px; background-color: #e8f5e9;
+      border-left: 3px solid #2e7d32; border-radius: 0 4px 4px 0;
+    }
+
+    .imc-tabela-ref h3 { color: #2e7d32; font-size: 16px; margin-bottom: 10px; }
+    .imc-ref-table { width: 100%; max-width: 400px; border-collapse: collapse; font-size: 14px; }
+    .imc-ref-table th { background-color: #2e7d32; color: white; padding: 8px 12px; text-align: left; }
+    .imc-ref-table td { padding: 7px 12px; border: 1px solid #ddd; }
+    .imc-ref-table tr:nth-child(even) td { background-color: #f0f0f0; }
+    .imc-ref-table tr.destaque td {
+      background-color: #c8e6c9 !important;
+      font-weight: bold; color: #1b5e20;
+    }
+
+    /* === FORMULÁRIO === */
+    form label { font-weight: bold; }
+    form input, form textarea {
+      width: 100%; max-width: 400px; padding: 8px;
+      border: 1px solid #ccc; border-radius: 4px; font-size: 14px;
+    }
+    form button {
+      background-color: #2e7d32; color: white;
+      padding: 10px 25px; border: none; border-radius: 4px;
+      cursor: pointer; font-size: 15px;
+    }
+    form button:hover { background-color: #1b5e20; }
+
+    footer {
+      background-color: #2e7d32; color: white;
+      text-align: center; padding: 15px; margin-top: 40px;
+    }
+
+    @media (max-width: 600px) {
+      .imc-form { flex-direction: column; }
+      .imc-field input { width: 100%; }
+      .imc-barra-labels { font-size: 10px; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Recursos Fitness</h1>
+    <nav class="navbar navbar-expand-lg" style="background-color: #2e7d32;">
+      <div class="container-fluid">
+        <a class="navbar-brand text-white fw-bold" href="#">Fitness Page</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav">
+            <li class="nav-item"><a class="nav-link text-white fw-bold" href="#galeria">Home</a></li>
+            <li class="nav-item"><a class="nav-link text-white fw-bold" href="#contato">About</a></li>
+            <li class="nav-item"><a class="nav-link text-white fw-bold" href="#lista">More</a></li>
+            <li class="nav-item"><a class="nav-link text-white fw-bold" href="#video">Exercises</a></li>
+            <li class="nav-item"><a class="nav-link text-white fw-bold" href="#imc">IMC</a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+  </header>
+
+  <section id="sobre">
+    <h2>Sobre o Projeto</h2>
+    <p>Este site tem como objetivo apresentar recursos voltados para a prática de atividades físicas e uma vida mais saudável. Aqui você vai encontrar dicas de treino, alimentação e bem-estar para quem quer começar ou melhorar sua rotina fitness.</p>
+    <img src="img/fitness.webp" alt="Pessoa se exercitando" />
+  </section>
+
+  <!-- FUNCIONALIDADE 1: FILTRO DE CATEGORIAS -->
+  <section id="galeria">
+    <h2>Galeria</h2>
+
+    <div class="filtro-container">
+      <span class="filtro-label">Filtrar por categoria:</span>
+      <div class="filtro-botoes">
+        <button class="btn-filtro ativo" data-categoria="todos">Todos</button>
+        <button class="btn-filtro" data-categoria="musculacao">Musculação</button>
+        <button class="btn-filtro" data-categoria="corrida">Corrida</button>
+        <button class="btn-filtro" data-categoria="yoga">Yoga</button>
+      </div>
+    </div>
+
+    <div class="galeria" id="galeria-items">
+      <figure class="galeria-item" data-categoria="musculacao">
+        <img src="img/musculacao.webp" alt="Musculação" />
+        <figcaption>Musculação</figcaption>
+        <span class="tag-categoria">Musculação</span>
+      </figure>
+      <figure class="galeria-item" data-categoria="corrida">
+        <img src="img/corrida.webp" alt="Corrida" />
+        <figcaption>Corrida</figcaption>
+        <span class="tag-categoria">Corrida</span>
+      </figure>
+      <figure class="galeria-item" data-categoria="yoga">
+        <img src="img/yoga.webp" alt="Yoga" />
+        <figcaption>Yoga</figcaption>
+        <span class="tag-categoria">Yoga</span>
+      </figure>
+    </div>
+    <p id="galeria-vazia" class="galeria-vazia" style="display:none;">Nenhum item encontrado para esta categoria.</p>
+  </section>
+
+  <section id="video">
+    <h2>Vídeo: Treino para Iniciantes</h2>
+    <video controls width="600">
+      <source src="videos/videoplayback.mp4" type="video/mp4" />
+      Seu navegador não suporta o elemento de vídeo.
+    </video>
+    <p class="legenda">Vídeo demonstrativo de uma rotina de treino para iniciantes.</p>
+  </section>
+
+  <section id="lista">
+    <h2>Dicas de Saúde e Bem-Estar</h2>
+    <h3>Dicas Gerais (Lista não ordenada)</h3>
+    <ul>
+      <li>Beba pelo menos 2 litros de água por dia</li>
+      <li>Durma entre 7 e 9 horas por noite</li>
+      <li>Faça pelo menos 30 minutos de exercício diário</li>
+      <li>Evite o consumo excessivo de açúcar e alimentos ultraprocessados</li>
+      <li>Alongue-se antes e depois dos treinos</li>
+      <li>Consulte um profissional antes de iniciar uma nova rotina de exercícios</li>
+    </ul>
+    <h3>Passos para Montar um Plano de Treino (Lista ordenada)</h3>
+    <ol>
+      <li>Defina seus objetivos (emagrecer, ganhar massa, etc.)</li>
+      <li>Avalie seu condicionamento físico atual</li>
+      <li>Escolha os tipos de exercício que vai praticar</li>
+      <li>Organize os dias e horários da semana</li>
+      <li>Comece com cargas e intensidades leves</li>
+      <li>Aumente a intensidade gradualmente ao longo das semanas</li>
+    </ol>
+  </section>
+
+  <section id="tabela">
+    <h2>Tabela de Treinos Semanais</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Dia</th><th>Grupo Muscular</th><th>Exercícios</th><th>Duração</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Segunda-feira</td><td>Peito e Tríceps</td><td>Supino, Crucifixo, Tríceps corda</td><td>60 min</td></tr>
+        <tr><td>Terça-feira</td><td>Costas e Bíceps</td><td>Remada, Puxada, Rosca direta</td><td>60 min</td></tr>
+        <tr><td>Quarta-feira</td><td>Cardio</td><td>Corrida, Bicicleta, Pular corda</td><td>45 min</td></tr>
+        <tr><td>Quinta-feira</td><td>Ombros</td><td>Desenvolvimento, Elevação lateral</td><td>50 min</td></tr>
+        <tr><td>Sexta-feira</td><td>Pernas</td><td>Agachamento, Leg press, Cadeira extensora</td><td>70 min</td></tr>
+        <tr><td>Sábado</td><td>Abdômen e Core</td><td>Prancha, Abdominal, Elevação de pernas</td><td>30 min</td></tr>
+        <tr><td>Domingo</td><td>Descanso</td><td>Alongamento e caminhada leve</td><td>20 min</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- FUNCIONALIDADE 2: CALCULADORA DE IMC -->
+  <section id="imc">
+    <h2>Calculadora de IMC</h2>
+    <p>Descubra seu Índice de Massa Corporal e entenda o que ele significa para sua saúde.</p>
+
+    <div class="imc-wrapper">
+      <div class="imc-form">
+        <div class="imc-field">
+          <label for="imc-peso">Peso (kg)</label>
+          <input type="number" id="imc-peso" placeholder="Ex: 70" min="1" max="300" step="0.1" />
+        </div>
+        <div class="imc-field">
+          <label for="imc-altura">Altura (cm)</label>
+          <input type="number" id="imc-altura" placeholder="Ex: 175" min="50" max="250" step="1" />
+        </div>
+        <button id="btn-calcular-imc" type="button">Calcular IMC</button>
+        <button id="btn-limpar-imc" type="button">Limpar</button>
+      </div>
+
+      <div class="imc-resultado" id="imc-resultado" style="display:none;">
+        <div class="imc-valor-box">
+          <span class="imc-label-resultado">Seu IMC</span>
+          <span class="imc-numero" id="imc-numero">--</span>
+          <span class="imc-classificacao" id="imc-classificacao">--</span>
+        </div>
+        <div class="imc-barra-container">
+          <div class="imc-barra">
+            <div class="imc-barra-marker" id="imc-barra-marker" style="left:0%"></div>
+          </div>
+          <div class="imc-barra-labels">
+            <span>Abaixo do peso</span>
+            <span>Normal</span>
+            <span>Sobrepeso</span>
+            <span>Obesidade</span>
+          </div>
+        </div>
+        <p class="imc-dica" id="imc-dica"></p>
+      </div>
+
+      <div class="imc-tabela-ref">
+        <h3>Tabela de Referência (OMS)</h3>
+        <table class="imc-ref-table">
+          <thead><tr><th>IMC</th><th>Classificação</th></tr></thead>
+          <tbody>
+            <tr><td>&lt; 18,5</td><td>Abaixo do peso</td></tr>
+            <tr><td>18,5 – 24,9</td><td>Peso normal</td></tr>
+            <tr><td>25,0 – 29,9</td><td>Sobrepeso</td></tr>
+            <tr><td>30,0 – 34,9</td><td>Obesidade grau I</td></tr>
+            <tr><td>35,0 – 39,9</td><td>Obesidade grau II</td></tr>
+            <tr><td>≥ 40,0</td><td>Obesidade grau III</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section id="contato">
+    <h2>Contato</h2>
+    <form action="#" method="post">
+      <label for="nome">Nome:</label><br />
+      <input type="text" id="nome" name="nome" placeholder="Digite seu nome" /><br /><br />
+      <label for="email">E-mail:</label><br />
+      <input type="email" id="email" name="email" placeholder="Digite seu e-mail" /><br /><br />
+      <label for="mensagem">Mensagem:</label><br />
+      <textarea id="mensagem" name="mensagem" rows="5" cols="40" placeholder="Digite sua mensagem"></textarea><br /><br />
+      <button type="submit">Enviar</button>
+    </form>
+  </section>
+
+  <footer>
+    <p>&copy; 2026 Recursos Fitness. Todos os direitos reservados.</p>
+    <p>Contato: fitness@email.com</p>
+  </footer>
+
+  <script>
+    // ============================================
+    // FILTRO DE CATEGORIAS
+    // ============================================
+    document.querySelectorAll('.btn-filtro').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var categoria = this.getAttribute('data-categoria');
+
+        // Atualiza botão ativo
+        document.querySelectorAll('.btn-filtro').forEach(function(b) {
+          b.classList.remove('ativo');
+        });
+        this.classList.add('ativo');
+
+        var itens = document.querySelectorAll('.galeria-item');
+        var visiveis = 0;
+
+        itens.forEach(function(item) {
+          var pertence = categoria === 'todos' || item.getAttribute('data-categoria') === categoria;
+          if (pertence) {
+            item.classList.remove('oculto');
+            item.classList.remove('aparecendo');
+            // força reflow para reiniciar animação
+            void item.offsetWidth;
+            item.classList.add('aparecendo');
+            visiveis++;
+          } else {
+            item.classList.add('oculto');
+            item.classList.remove('aparecendo');
+          }
+        });
+
+        var aviso = document.getElementById('galeria-vazia');
+        aviso.style.display = visiveis === 0 ? 'block' : 'none';
+      });
+    });
+
+    // ============================================
+    // CALCULADORA DE IMC
+    // ============================================
+    function limparErrosIMC() {
+      var campos = [document.getElementById('imc-peso'), document.getElementById('imc-altura')];
+      campos.forEach(function(el) {
+        el.classList.remove('input-erro');
+        var msg = el.parentElement.querySelector('.erro-msg');
+        if (msg) msg.remove();
+      });
+    }
+
+    function mostrarErroIMC(input, mensagem) {
+      input.classList.add('input-erro');
+      var span = document.createElement('span');
+      span.className = 'erro-msg';
+      span.textContent = mensagem;
+      input.parentElement.appendChild(span);
+    }
+
+    function mapearPosicao(val, minVal, maxVal, minPos, maxPos) {
+      var pos = ((val - minVal) / (maxVal - minVal)) * (maxPos - minPos) + minPos;
+      return Math.min(Math.max(pos, 1), 99);
+    }
+
+    function classificarIMC(imc) {
+      if (imc < 18.5) return {
+        classificacao: 'Abaixo do peso', cor: '#1565c0',
+        dica: 'Seu IMC indica abaixo do peso. Consulte um nutricionista para avaliar sua alimentação e garantir uma dieta equilibrada.',
+        posicao: mapearPosicao(imc, 10, 18.5, 0, 20)
+      };
+      if (imc < 25) return {
+        classificacao: 'Peso normal', cor: '#2e7d32',
+        dica: 'Parabéns! Seu IMC está dentro da faixa saudável. Continue mantendo uma alimentação equilibrada e praticando exercícios regularmente.',
+        posicao: mapearPosicao(imc, 18.5, 25, 20, 47)
+      };
+      if (imc < 30) return {
+        classificacao: 'Sobrepeso', cor: '#e65100',
+        dica: 'Seu IMC indica sobrepeso. Pequenas mudanças na alimentação e a prática regular de exercícios físicos podem ajudar bastante.',
+        posicao: mapearPosicao(imc, 25, 30, 47, 68)
+      };
+      if (imc < 35) return {
+        classificacao: 'Obesidade Grau I', cor: '#c62828',
+        dica: 'Seu IMC indica obesidade grau I. É recomendado buscar acompanhamento médico e nutricional para um plano de emagrecimento seguro.',
+        posicao: mapearPosicao(imc, 30, 35, 68, 82)
+      };
+      if (imc < 40) return {
+        classificacao: 'Obesidade Grau II', cor: '#b71c1c',
+        dica: 'Seu IMC indica obesidade grau II. Procure orientação médica especializada para cuidar da sua saúde com segurança.',
+        posicao: mapearPosicao(imc, 35, 40, 82, 93)
+      };
+      return {
+        classificacao: 'Obesidade Grau III', cor: '#880e4f',
+        dica: 'Seu IMC indica obesidade grau III. É fundamental buscar acompanhamento médico urgente para um tratamento adequado.',
+        posicao: mapearPosicao(imc, 40, 50, 93, 100)
+      };
+    }
+
+    function calcularIMC() {
+      limparErrosIMC();
+
+      var inputPeso   = document.getElementById('imc-peso');
+      var inputAltura = document.getElementById('imc-altura');
+      var peso   = parseFloat(inputPeso.value);
+      var altura = parseFloat(inputAltura.value);
+      var valido = true;
+
+      if (!inputPeso.value || isNaN(peso) || peso <= 0 || peso > 300) {
+        mostrarErroIMC(inputPeso, 'Insira um peso válido (1–300 kg).');
+        valido = false;
+      }
+      if (!inputAltura.value || isNaN(altura) || altura < 50 || altura > 250) {
+        mostrarErroIMC(inputAltura, 'Insira uma altura válida (50–250 cm).');
+        valido = false;
+      }
+      if (!valido) return;
+
+      var alturaM = altura / 100;
+      var imc = peso / (alturaM * alturaM);
+      var info = classificarIMC(imc);
+
+      document.getElementById('imc-numero').textContent        = imc.toFixed(1);
+      document.getElementById('imc-numero').style.color        = info.cor;
+      document.getElementById('imc-classificacao').textContent = info.classificacao;
+      document.getElementById('imc-dica').textContent          = info.dica;
+      document.getElementById('imc-barra-marker').style.left   = info.posicao + '%';
+
+      // Exibe resultado
+      var resultado = document.getElementById('imc-resultado');
+      resultado.style.display = 'block';
+
+      // Destaca linha da tabela de referência
+      var linhas = document.querySelectorAll('.imc-ref-table tbody tr');
+      linhas.forEach(function(tr) { tr.classList.remove('destaque'); });
+      var idx = 5;
+      if (imc < 18.5) idx = 0;
+      else if (imc < 25) idx = 1;
+      else if (imc < 30) idx = 2;
+      else if (imc < 35) idx = 3;
+      else if (imc < 40) idx = 4;
+      if (linhas[idx]) linhas[idx].classList.add('destaque');
+
+      resultado.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    function limparIMC() {
+      document.getElementById('imc-peso').value   = '';
+      document.getElementById('imc-altura').value = '';
+      document.getElementById('imc-resultado').style.display = 'none';
+      limparErrosIMC();
+      document.querySelectorAll('.imc-ref-table tbody tr').forEach(function(tr) {
+        tr.classList.remove('destaque');
+      });
+    }
+
+    document.getElementById('btn-calcular-imc').addEventListener('click', calcularIMC);
+    document.getElementById('btn-limpar-imc').addEventListener('click', limparIMC);
+
+    document.getElementById('imc-peso').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') calcularIMC();
+    });
+    document.getElementById('imc-altura').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') calcularIMC();
+    });
+
+    // Remove erro ao digitar
+    ['imc-peso', 'imc-altura'].forEach(function(id) {
+      document.getElementById(id).addEventListener('input', function() {
+        this.classList.remove('input-erro');
+        var msg = this.parentElement.querySelector('.erro-msg');
+        if (msg) msg.remove();
+      });
+    });
+  </script>
+
+</body>
+</html>
